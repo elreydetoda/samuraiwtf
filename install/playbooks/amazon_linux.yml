@@ -7,6 +7,16 @@
 
 ### Prerequisites
 
+  - name: Check if nginx is already installed
+    stat:
+      path: /etc/nginx/nginx.conf
+    register: stat_nginx_conf
+
+  - name: Install nginx
+    command: "amazon-linux-extras install nginx1.12"
+    become: yes
+    when: stat_nginx_conf.stat.exists == False
+
   - name: ensure prerequisite packages are installed
     yum:
       name: "{{ packages }}"
@@ -18,20 +28,29 @@
       - docker
       - unzip
       - python-pip
+      - php-fpm
+
+  - name: python prerequisite modules
+    pip:
+      name: "{{ modules }}"
+    become: yesf
+    vars:
+      modules:
+      - docker
 
   - name: Check if docker-compose is already installed
     stat:
-      path: /usr/local/bin/docker-compose
+      path: /usr/bin/docker-compose
     register: stat_docker_compose
 
   - name: install docker-compose
-    shell: 'curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose'
+    shell: 'curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose'
     become: yes
     when: stat_docker_compose.stat.exists == False 
 
   - name: set permissions for docker-compose
     file:
-      path: /usr/local/bin/docker-compose
+      path: /usr/bin/docker-compose
       mode: "+x"
     become: yes
 
@@ -96,7 +115,7 @@
       path: /opt/samurai/postman
       state: directory
 
-  - name: Download and Postman
+  - name: Download and install and Postman
     unarchive:
       src: https://dl.pstmn.io/download/latest/linux64
       dest: /opt/samurai/
@@ -192,3 +211,109 @@
     become: yes
     when: stat_juiceshop_latest.stat.exists == False
 
+  - name: Make sure docker service is running
+    service:
+      name: docker
+      state: started
+      enabled: yes
+    become: yes
+
+  - name: Install DVWA docker container
+    docker_container:
+      name: dvwa
+      image: bit0pus/docker-dvwa
+    become: yes
+
+  - name: Install Mutillidae docker container
+    docker_container:
+      name: mutillidae
+      image: bit0pus/docker-mutillidae
+    become: yes
+
+## Minimal stuff needed to be considered useable
+## TODO: Setup samurai dojo basic
+## TODO: Setup samurai dojo scavanger
+## TODO: Setup professionallyevil.wtf
+## TODO: Auto-start targets on restarts
+
+
+  - name: Install nginx configuration
+    copy:
+      src: ../../config/sites-enabled/
+      dest: /etc/nginx/conf.d/
+    become: yes
+
+  - name: Inclulde .wtf files in nginx config
+    replace:
+      path: /etc/nginx/nginx.conf
+      regexp: 'include /etc/nginx/conf.d/\*\.conf;'
+      replace: 'include /etc/nginx/conf.d/*.wtf;'
+    become: yes
+
+  - name: Setup hosts target entries
+    blockinfile:
+      path: /etc/hosts
+      block: |
+        127.0.0.1   juice-shop.wtf
+        127.0.0.1   dojo-basic.wtf
+        127.0.0.1   dojo-scavenger.wtf
+        127.0.0.1   dvwa.wtf
+        127.0.0.1   mutillidae.wtf
+        127.0.0.1   professionallyevil.wtf
+    become: yes
+
+  - name: Script to auto-start targets
+    copy:
+      dest: /usr/local/bin/startup_targets.sh
+      src: ../../config/startup_targets.sh
+      mode: 0744
+    become: yes
+
+  - name: Remove sudo
+    replace:
+      path: /usr/local/bin/startup_targets.sh
+      regexp: '^sudo '
+      replace: ''
+    become: yes
+
+
+
+#  - name: Set rc.local permissions
+#    file:
+#      path: /etc/rc.d/rc.local
+#      mode: "+x"
+#    become: yes
+
+#  - name: Add startup to rc.local
+#    lineinfile:
+#      path: /etc/rc.d/rc.local
+#      line: /root/startup_targets.sh
+#    become: yes
+
+#  - name: Setup cron-tab to auto-start targets
+#    cron:
+#      name: "Startup Targets"
+#      job: "/root/startup_targets.sh"
+#      special_time: reboot
+#    become: yes
+
+  - name: Create service descriptor
+    copy:
+      dest: /etc/systemd/system/wtftargets.service
+      content: |
+        [Unit]
+        Description=WTF Targets service
+        After=systemd-user-sessions.service
+        [Service]
+        Type=forking
+        ExecStart=/usr/local/bin/startup_targets.sh
+      mode: 0744
+    become: yes
+
+  - name: Start nginx
+    service:
+      name: nginx
+      state: started
+      enabled: yes
+    become: yes
+    
