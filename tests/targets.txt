@@ -1,0 +1,3 @@
+dojo-basic.wtf 30080 30443
+dojo-scavenger.wtf 31080 31443
+juice-shop.wtf 3000 none
