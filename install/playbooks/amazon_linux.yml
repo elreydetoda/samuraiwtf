@@ -33,7 +33,7 @@
   - name: python prerequisite modules
     pip:
       name: "{{ modules }}"
-    become: yesf
+    become: yes
     vars:
       modules:
       - docker
