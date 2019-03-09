@@ -180,18 +180,7 @@
 
   - import_tasks: ../../targets/juice-shop/juice-shop.yml
 
-  - name: Make sure docker service is running
-    service:
-      name: docker
-      state: started
-      enabled: yes
-    become: yes
-
-  - name: Install DVWA docker container
-    docker_container:
-      name: dvwa
-      image: bit0pus/docker-dvwa
-    become: yes
+  - import_tasks: ../../targets/dvwa/dvwa.yml
 
   - name: Install Mutillidae docker container
     docker_container:
@@ -318,7 +307,7 @@
       mode: 0744
     become: yes
 
-  - name: Start nginx
+w  - name: Start nginx
     service:
       name: nginx
       state: started
