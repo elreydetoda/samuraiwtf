@@ -182,11 +182,7 @@
 
   - import_tasks: ../../targets/dvwa/dvwa.yml
 
-  - name: Install Mutillidae docker container
-    docker_container:
-      name: mutillidae
-      image: bit0pus/docker-mutillidae
-    become: yes
+  - import_tasks: ../../targets/mutillidae/mutillidae.tml
 
 ## Minimal stuff needed to be considered useable
 ## TODO: Setup samurai dojo basic
