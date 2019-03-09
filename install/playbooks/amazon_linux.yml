@@ -236,19 +236,42 @@
 ## TODO: Setup professionallyevil.wtf
 ## TODO: Auto-start targets on restarts
 
+### Update PHP Config
+  - name: Update PHP listener
+    replace:
+      path: /etc/php-fpm.d/www.conf
+      regexp: '^listen = 127.0.0.1.*'
+      replace: 'listen = /var/run/php-fpm/php-fpm.sock'
+    become: yes
+
+  - name: Update PHP User
+    replace:
+      path: /etc/php-fpm.d/www.conf
+      regexp: '^user = apache'
+      replace: 'user = nginx'
+    become: yes
+
+  - name: Update PHP Group
+    replace:
+      path: /etc/php-fpm.d/www.conf
+      regexp: '^group = apache'
+      replace: 'group = nginx'
+    become: yes
+
 
   - name: Install nginx configuration
     copy:
-      src: ../../config/sites-enabled/
+      src: ../../config/nginx/
       dest: /etc/nginx/conf.d/
+      force: no
     become: yes
 
-  - name: Inclulde .wtf files in nginx config
-    replace:
-      path: /etc/nginx/nginx.conf
-      regexp: 'include /etc/nginx/conf.d/\*\.conf;'
-      replace: 'include /etc/nginx/conf.d/*.wtf;'
-    become: yes
+  # - name: Inclulde .wtf files in nginx config
+  #   replace:
+  #     path: /etc/nginx/nginx.conf
+  #     regexp: 'include /etc/nginx/conf.d/\*\.conf;'
+  #     replace: 'include /etc/nginx/conf.d/*.wtf;'
+  #   become: yes
 
   - name: Setup hosts target entries
     blockinfile:
@@ -267,6 +290,7 @@
       dest: /usr/local/bin/startup_targets.sh
       src: ../../config/startup_targets.sh
       mode: 0744
+      force: no
     become: yes
 
   - name: Remove sudo
@@ -296,6 +320,14 @@
 #      job: "/root/startup_targets.sh"
 #      special_time: reboot
 #    become: yes
+
+  - name: Start PHP Processor
+    service:
+      name: php-fpm
+      state: started
+      enabled: yes
+    become: yes
+
 
   - name: Create service descriptor
     copy:
