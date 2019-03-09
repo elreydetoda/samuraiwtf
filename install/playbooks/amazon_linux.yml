@@ -258,6 +258,13 @@
       replace: 'group = nginx'
     become: yes
 
+  - name: Add info.php test file
+    copy:
+      dest: /usr/share/nginx/html/info.php
+      content: |
+        <?php phpinfo(); ?>
+      mode: 0644
+      force: no
 
   - name: Install nginx configuration
     copy:
