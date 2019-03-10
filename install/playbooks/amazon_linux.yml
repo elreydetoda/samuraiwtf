@@ -178,17 +178,16 @@
       state: directory
     become: yes
 
+  - import_tasks: ../../targets/samurai-dojo/samurai-dojo.yml
+
   - import_tasks: ../../targets/juice-shop/juice-shop.yml
 
   - import_tasks: ../../targets/dvwa/dvwa.yml
 
-  - import_tasks: ../../targets/mutillidae/mutillidae.tml
+  - import_tasks: ../../targets/mutillidae/mutillidae.yml
 
 ## Minimal stuff needed to be considered useable
-## TODO: Setup samurai dojo basic
-## TODO: Setup samurai dojo scavanger
 ## TODO: Setup professionallyevil.wtf
-## TODO: Auto-start targets on restarts
 
 ### Update PHP Config
   - name: Update PHP listener
@@ -227,13 +226,6 @@
       force: no
     become: yes
 
-  # - name: Inclulde .wtf files in nginx config
-  #   replace:
-  #     path: /etc/nginx/nginx.conf
-  #     regexp: 'include /etc/nginx/conf.d/\*\.conf;'
-  #     replace: 'include /etc/nginx/conf.d/*.wtf;'
-  #   become: yes
-
   - name: Setup hosts target entries
     blockinfile:
       path: /etc/hosts
@@ -245,42 +237,6 @@
         127.0.0.1   mutillidae.wtf
         127.0.0.1   professionallyevil.wtf
     become: yes
-
-  - name: Script to auto-start targets
-    copy:
-      dest: /usr/local/bin/startup_targets.sh
-      src: ../../config/startup_targets.sh
-      mode: 0744
-      force: no
-    become: yes
-
-  - name: Remove sudo
-    replace:
-      path: /usr/local/bin/startup_targets.sh
-      regexp: '^sudo '
-      replace: ''
-    become: yes
-
-
-
-#  - name: Set rc.local permissions
-#    file:
-#      path: /etc/rc.d/rc.local
-#      mode: "+x"
-#    become: yes
-
-#  - name: Add startup to rc.local
-#    lineinfile:
-#      path: /etc/rc.d/rc.local
-#      line: /root/startup_targets.sh
-#    become: yes
-
-#  - name: Setup cron-tab to auto-start targets
-#    cron:
-#      name: "Startup Targets"
-#      job: "/root/startup_targets.sh"
-#      special_time: reboot
-#    become: yes
 
   - name: Start PHP Processor
     service:
@@ -303,10 +259,15 @@
       mode: 0744
     become: yes
 
-w  - name: Start nginx
+  - name: Start nginx
     service:
       name: nginx
       state: started
       enabled: yes
     become: yes
     
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
