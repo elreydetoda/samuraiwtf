@@ -39,20 +39,23 @@
     force: no
   become: yes
 
-- name: Create service descriptor
+- name: Create service descriptor for wtf-juice-shop
   copy:
     dest: /etc/systemd/system/wtf-juice-shop.service
     content: |
       [Unit]
       Description=Juice Shop Target service
-      After=systemd-user-sessions.service
+
       [Service]
       Type=forking
       ExecStart=/usr/local/bin/start_juice-shop.sh
+
+      [Install]
+      WantedBy=multi-user.target
     mode: 0744
   become: yes
 
-- name: Start Juice Shop
+- name: Start Juice-Shop
   service:
     name: wtf-juice-shop.service
     state: started

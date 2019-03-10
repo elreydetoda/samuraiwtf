@@ -19,6 +19,7 @@
       Description=DVWA SamuraiWTF Target
       After=docker.service
       Requires=docker.service
+
       [Service]
       TimeoutStartSec=0
       Restart=always
@@ -26,6 +27,9 @@
       ExecStart=/usr/bin/docker run --rm -p 31000:80 -p 33006:3306 --name %n bit0pus/docker-dvwa
       ExecStop=/usr/bin/docker stop -t 10 %n
       ExecStopPost=/usr/bin/docker stop -t 10 dvwa
+
+      [Install]
+      WantedBy=multi-user.target
     mode: 0744
   become: yes
 

@@ -82,11 +82,15 @@
     content: |
       [Unit]
       Description=dojo-basic and dojo-scavenger target service
-      After=systemd-user-sessions.service docker.service
+      After=docker.service
       Requires=docker.service
+
       [Service]
       Type=forking
       ExecStart=/usr/local/bin/start_samurai-dojo.sh
+
+      [Install]
+      WantedBy=multi-user.target
     mode: 0744
   become: yes
 
