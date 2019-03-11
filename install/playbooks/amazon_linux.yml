@@ -157,17 +157,20 @@
   - name: Download burp plugin - co2
     get_url:
       url: https://portswigger.net/bappstore/bapps/download/c5071c7a7e004f72ae485e8a72911afc
-      dest: ~/Downloads/co2.bapp
+      dest: /opt/burp_plugins/co2.bapp
+    become: yes
 
   - name: Download burp plugin - paramalyzer
     get_url:
       url: https://portswigger.net/bappstore/bapps/download/0ac13c45adff4e31a3ca8dc76dd6286c
-      dest: ~/Downloads/paramalyzer.bapp
+      dest: /opt/burp_plugins/paramalyzer.bapp
+    become: yes
 
   - name: Download burp plugin - wsdler
     get_url:
       url: https://portswigger.net/bappstore/bapps/download/594a49bb233748f2bc80a9eb18a2e08f
-      dest: ~/Downloads/wsdler.bapp
+      dest: /opt/burp_plugins/wsdler.bapp
+    become: yes
 
 ### Install Targets
   - name: create the targets directory
