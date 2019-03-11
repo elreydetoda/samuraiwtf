@@ -51,3 +51,12 @@ Contributors are very welcome and the contribution process is standard:
   * submit a pull request
   
 Substantial or *Regular* contributors may also be brought in as full team members. This includes those who have made substantial contributions to previous versions of SamuraiWTF with the assumption they will continue to do so.
+
+
+# Amazon Linux Notes
+There is a Ansible playbook available for Amazon Linux (i.e. to set up SamuraiWTF in a AWS Workspaces).
+This is for online classrooms.  There are some caveats to this build:
+
+  * You must start with a Amazon Linux workspace.  4GB Ram is sufficient.  Disk size can be 40GB or less.
+  * The build sets up targets and tools but some customizations, such as desktop wallpaper, must be completed manually.
+  * AWS terms of services does not allow any hacking / scanning from workspaces. Therefore it is recommended that you remove the default outbound rule for the workspaces Security Group, so that no traffic will be able to leave the workspace.  Strictly speaking, once SamuraiWTF is installed and configured, internet access outbound should no longer be needed.  All the target apps are contained within the environment as local destinations.
