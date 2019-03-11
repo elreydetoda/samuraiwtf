@@ -1,0 +1,92 @@
+
+
+- name: Download yarn repo
+  get_url:
+    url: https://dl.yarnpkg.com/rpm/yarn.repo
+    dest: /etc/yum.repos.d/yarn.repo
+  become: yes
+
+- name: Install yarn
+  yum:
+    name: yarn
+    enablerepo: nodesource
+  become: yes
+
+- name: Fetch musashi-js source from github
+  git:
+    repo: https://github.com/SamuraiWTF/musashi-js.git
+    dest: /opt/targets/musashi-js
+    depth: 1
+    force: yes
+  become: yes
+
+- name: Install musashi-js locally
+  shell: yarn install
+  args:
+    chdir: /opt/targets/musashi-js
+    executable: /usr/bin/bash
+
+- name: Create musashi-js target service descriptor
+  copy:
+    dest: /etc/systemd/system/wtf-musashi.service
+    content: |
+      [Unit]
+      Description=musashi-js target service
+
+      [Service]
+      Type=simple
+      WorkingDirectory=/opt/targets/musashi-js/
+      ExecStart=/usr/bin/yarn start
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: 0744
+  become: yes
+
+- name: Setup hosts file entries
+  lineinfile:
+    dest: /etc/hosts
+    line: '{{ item }}'
+  with_items:
+    - '127.0.0.1   api.cors.dem'
+    - '127.0.0.1   www.cors.dem'
+  become: yes
+
+- name: Create www.cors.dem nginx config
+  copy:
+    dest: /etc/nginx/conf.d/www-cors.conf
+    content: |
+      server {
+        listen 80;
+        server_name www.cors.dem;
+        location / {
+          proxy_pass http://localhost:3021;
+        }
+      }
+    mode: 0644
+  become: yes
+  notify:
+    - restart nginx
+
+- name: Create api.cors.dem nginx config
+  copy:
+    dest: /etc/nginx/conf.d/api-cors.conf
+    content: |
+      server {
+        listen 80;
+        server_name api.cors.dem;
+        location / {
+          proxy_pass http://localhost:3020;
+        }
+      }
+    mode: 0644
+  become: yes
+  notify:
+    - restart nginx
+
+- name: Start musashi targets
+  service:
+    name: wtf-musashi.service
+    state: started
+    enabled: yes
+  become: yes

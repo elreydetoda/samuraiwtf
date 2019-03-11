@@ -169,8 +169,6 @@
       url: https://portswigger.net/bappstore/bapps/download/594a49bb233748f2bc80a9eb18a2e08f
       dest: ~/Downloads/wsdler.bapp
 
-# TODO: figure out how to add something to the menu
-
 ### Install Targets
   - name: create the targets directory
     file:
@@ -186,8 +184,8 @@
 
   - import_tasks: ../../targets/mutillidae/mutillidae.yml
 
-## Minimal stuff needed to be considered useable
-## TODO: Setup professionallyevil.wtf
+  - import_tasks: ../../targets/musashi/musashi-js.yml
+
 
 ### Update PHP Config
   - name: Update PHP listener
