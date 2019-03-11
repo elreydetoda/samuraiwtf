@@ -153,6 +153,12 @@
       group: "{{ lookup('env','USER') }}"
       mode: 0744
     become: yes
+    
+  - name: create the main Samurai program folder
+    file:
+      path: /opt/burp_plugins
+      state: directory
+    become: yes
  
   - name: Download burp plugin - co2
     get_url:
