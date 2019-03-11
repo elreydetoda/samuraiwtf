@@ -1,0 +1,48 @@
+---
+
+- name: run the playbook tasks on the localhost from the ~/samuraiwtf folder
+  hosts: 127.0.0.1
+  connection: local
+
+  tasks:
+  - name: Copy Samurai icon
+    copy:
+      src: ../../config/samurai-icon.png
+      dest: /opt/samurai/
+    become: yes
+
+  - name: Setup menu /etc/samurai.d/desktop-directories
+    file:
+      path: /etc/samurai.d/desktop-directories/
+      state: directory
+    become: yes
+
+  - name: Copy in directory files
+    copy:
+      src: "{{ item }}"
+      dest: /etc/samurai.d/desktop-directories/
+      mode: 0644
+    become: yes
+    with_fileglob:
+      - "../../config/xdg-menu/*.directory"
+
+  - name: Setup menu /etc/samurai.d/applications
+    file:
+      path: /etc/samurai.d/applications/
+      state: directory
+    become: yes
+
+  - name: Copy in application files
+    copy:
+      src: "{{ item }}"
+      dest: /etc/samurai.d/applications/
+      mode: 0644
+    become: yes
+    with_fileglob:
+      - "../../config/xdg-menu/*.desktop"
+
+  - name: Setup samuraiwtf.menu
+    copy:
+      src: ../../config/xdg-menu/samuraiwtf.menu
+      dest: /etc/xdg/menus/applications-merged/
+    become: yes

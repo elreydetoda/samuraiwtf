@@ -265,9 +265,11 @@
       state: started
       enabled: yes
     become: yes
-    
+   
   handlers:
     - name: restart nginx
       service:
         name: nginx
         state: restarted
+
+- import_playbook: menus.yml
