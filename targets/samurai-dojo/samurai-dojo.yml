@@ -145,4 +145,12 @@
   uri:
     url: http://localhost:30080/reset-db.php
 
+- name: Setup hosts file entries
+  lineinfile:
+    dest: /etc/hosts
+    line: '{{ item }}'
+  with_items:
+    - '127.0.0.1   dojo-basic.wtf'
+    - '127.0.0.1   dojo-scavenger.wtf'
+  become: y
 

@@ -62,3 +62,9 @@
     enabled: yes
   become: yes
 
+- name: Setup hosts file entries
+  lineinfile:
+    dest: /etc/hosts
+    line: '127.0.0.1   juice-shop.wtf'
+  become: y
+

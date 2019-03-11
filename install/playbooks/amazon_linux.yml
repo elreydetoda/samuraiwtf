@@ -224,18 +224,6 @@
       force: no
     become: yes
 
-  - name: Setup hosts target entries
-    blockinfile:
-      path: /etc/hosts
-      block: |
-        127.0.0.1   juice-shop.wtf
-        127.0.0.1   dojo-basic.wtf
-        127.0.0.1   dojo-scavenger.wtf
-        127.0.0.1   dvwa.wtf
-        127.0.0.1   mutillidae.wtf
-        127.0.0.1   professionallyevil.wtf
-    become: yes
-
   - name: Start PHP Processor
     service:
       name: php-fpm
