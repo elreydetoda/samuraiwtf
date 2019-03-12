@@ -166,7 +166,7 @@
       owner: "{{ lookup('env','USER') }}"
       group: "CORP\\domain users"
     become: yes
-
+    
   - name: Download burp plugin - co2
     get_url:
       url: https://portswigger.net/bappstore/bapps/download/c5071c7a7e004f72ae485e8a72911afc
