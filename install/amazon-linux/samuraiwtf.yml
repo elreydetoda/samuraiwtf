@@ -67,6 +67,13 @@
       dest: /opt/samurai/
     become: yes
 
+  - name: Copy App icons
+    copy:
+      src: ../../config/icons
+      dest: /opt/samurai/
+      directory_mode: yes
+    become: yes
+
 ### Menus
 
   - name: Setup menu /etc/samurai.d/desktop-directories
@@ -94,7 +101,7 @@
         [Desktop Entry]
         Type=Directory
         Name=Samurai WTF
-        Icon=/opt/samurai/icons/samurai-icon.png
+        Icon=/opt/samurai/samurai-icon.png
       mode: 0744
     become: yes
 
