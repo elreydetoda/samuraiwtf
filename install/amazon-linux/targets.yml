@@ -1,6 +1,7 @@
 - name: Install targets for SamuraiWTF
   hosts: 127.0.0.1
   connection: local
+  become: yes
   tasks:
 
   - name: Create targets folder
@@ -90,10 +91,10 @@
     become: yes
 
 #  - import_tasks: targets/juice-shop-tasks.yml
-#  - import_tasks: targets/dvwa/dvwa-tasks.yml
-#  - import_tasks: targets/mutillidae/mutillidae-tasks.yml
-#  - import_tasks: targets/samurai-dojo/samurai-dojo-tasks.yml
-#  - import_tasks: targets/musashi/musashi-task.yml
+#  - import_tasks: targets/dvwa-tasks.yml
+#  - import_tasks: targets/mutillidae-tasks.yml
+#  - import_tasks: targets/samurai-dojo-tasks.yml
+#  - import_tasks: targets/musashi-task.yml
 
   handlers:
     - name: restart nginx
