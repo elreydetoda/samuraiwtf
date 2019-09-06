@@ -53,37 +53,6 @@
       mode: "+x"
     become: yes
 
-  - name: Check if npm installer already downloaded
-    stat:
-      path: /tmp/npm_setup.sh
-    register: stat_npm_setup
-
-  - name: Download npm installer
-    get_url:
-      url: https://rpm.nodesource.com/setup_8.x
-      dest: /tmp/npm_setup.sh
-      mode: 0744
-    when: stat_npm_setup.stat.exists == False
-
-  - name: Install npm repo
-    shell: '/tmp/npm_setup.sh'
-    become: yes
-    when: stat_npm_setup.stat.exists == False
-
-  - name: Install nodejs
-    yum:
-      name: nodejs
-      enablerepo: nodesource
-    become: yes
-
-  - name: Download and install Chrome
-    yum:
-      name: https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-      state: present
-    become: yes
-
-## TODO: Figure out how to install Google Chrome
-
   - name: create the main Samurai program folder
     file:
       path: /opt/samurai
@@ -92,125 +61,23 @@
       group: "CORP\\domain users"
     become: yes
 
-### Install Tools
-
-  - name: create burpsuite folder
-    file:
-      path: /opt/samurai/burpsuite
-      state: directory
-
-  - name: download burpsuite community
-    get_url:
-      url: https://portswigger.net/burp/releases/download?product=community&type=jar
-      dest: /opt/samurai/burpsuite/burp.jar
-
-  - name: create zap folder
-    file:
-      path: /opt/samurai/zap
-      state: directory
-
-  - name: Download and unzip ZAP
-    unarchive:
-      src: https://github.com/zaproxy/zaproxy/releases/download/2.6.0/ZAP_2.6.0_Crossplatform.zip
-      dest: /opt/samurai/zap
-      remote_src: yes
-
-  - name: create Postman folder
-    file:
-      path: /opt/samurai/postman
-      state: directory
-
-  - name: Download and install and Postman
-    unarchive:
-      src: https://dl.pstmn.io/download/latest/linux64
+  - name: Copy Samurai icon
+    copy:
+      src: ../../config/samurai-icon.png
       dest: /opt/samurai/
-      remote_src: yes
-
-  - name: fetch nikto from github
-    git:
-      repo: https://github.com/sullo/nikto.git
-      dest: /opt/samurai/nikto
-      depth: 1
-
-  - name: fetch sqlmap from github
-    git:
-      repo: https://github.com/sqlmapproject/sqlmap.git
-      dest: /opt/samurai/sqlmap
-      depth: 1
-
-  - name: fetch fuzzdb from github
-    git:
-      repo: https://github.com/fuzzdb-project/fuzzdb.git
-      dest: /opt/samurai/fuzzdb
-      depth: 1
-
-  - name: fetch sqlmap from github
-    git:
-      repo: https://github.com/danielmiessler/SecLists.git
-      dest: /opt/samurai/SecLists
-      depth: 1
-
-  - name: Copy launcher scripts
-    copy:
-      src: ../../config/launcher/
-      dest: /usr/bin/
-      group: "CORP\\domain users"
-      mode: 0755
     become: yes
 
-### Plugin and Extension Downloads
-  - name: create burp plugins folder
+  - name: Setup menu /etc/samurai.d/desktop-directories
     file:
-      path: /opt/samurai/burp_plugins
+      path: /etc/samurai.d/desktop-directories/
       state: directory
-      owner: "{{ lookup('env','USER') }}"
-      group: "CORP\\domain users"
     become: yes
-    
-  - name: Download burp plugin - co2
-    get_url:
-      url: https://portswigger.net/bappstore/bapps/download/c5071c7a7e004f72ae485e8a72911afc
-      dest: /opt/samurai/burp_plugins/co2.bapp
 
-  - name: Download burp plugin - paramalyzer
-    get_url:
-      url: https://portswigger.net/bappstore/bapps/download/0ac13c45adff4e31a3ca8dc76dd6286c
-      dest: /opt/samurai/burp_plugins/paramalyzer.bapp
-
-  - name: Download burp plugin - wsdler
-    get_url:
-      url: https://portswigger.net/bappstore/bapps/download/594a49bb233748f2bc80a9eb18a2e08f
-      dest: /opt/samurai/burp_plugins/wsdler.bapp
-
-  - name: create firefox extensions folder
+  - name: Setup menu /etc/samurai.d/applications
     file:
-      path: /opt/samurai/firefox_extensions
+      path: /etc/samurai.d/applications/
       state: directory
-      owner: "{{ lookup('env','USER') }}"
-      group: "CORP\\domain users"
     become: yes
-
-  - name: Download foxyproxy extension
-    get_url:
-      url: https://addons.mozilla.org/firefox/downloads/latest/foxyproxy-standard/addon-2464-latest.xpi
-      dest: /opt/samurai/firefox_extensions/foxyproxy.xpi
-
-  - name: create google chrome extensions folder
-    file:
-      path: /opt/google/chrome/extensions
-      state: directory
-      owner: "{{ lookup('env','USER') }}"
-      group: "CORP\\domain users"
-    become: yes
-
-  - name: Copy extensions
-    copy:
-      src: "{{ item }}"
-      dest: /opt/google/chrome/extensions
-      mode: 0644
-    become: yes
-    with_fileglob:
-      - "../../config/crx/*.json"
 
 ### Setup first-time login customizations
   - name: Copy desktop file somewhere we can use it
@@ -244,6 +111,9 @@
       src: ../../config/home/bookmarks.html
       dest: /opt/samurai
 
+  - name: Install tools
+    import_playbook: tools.yml
+
   - name: Fix default Firefox bookmarks
     lineinfile:
       dest: /usr/lib64/firefox/distribution/distribution.ini
@@ -271,22 +141,10 @@
       state: absent
     become: yes
 
+
 ### Install Targets
-  - name: create the targets directory
-    file:
-      path: /opt/targets
-      state: directory
-    become: yes
-
-  - import_tasks: ../../targets/samurai-dojo/samurai-dojo.yml
-
-  - import_tasks: ../../targets/juice-shop/juice-shop.yml
-
-  - import_tasks: ../../targets/dvwa/dvwa.yml
-
-  - import_tasks: ../../targets/mutillidae/mutillidae.yml
-
-  - import_tasks: ../../targets/musashi/musashi-js.yml
+  - name: Install targets
+    import_playbook: targets.yml
 
 
 ### Update PHP Config

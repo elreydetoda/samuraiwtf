@@ -1,0 +1,34 @@
+- name: Download and install Chrome
+  yum:
+    name: https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+    state: present
+
+- name: Install Google Chrome
+  yum:
+    name:
+      - google-chrome-stable
+    update_cache: yes
+
+- name: create google chrome extensions folder
+  file:
+    path: /opt/google/chrome/extensions
+    state: directory
+    owner: "{{ lookup('env','USER') }}"
+    group: "CORP\\domain users"
+  become: yes
+
+- name: Copy extensions
+  copy:
+    src: "{{ item }}"
+    dest: /opt/google/chrome/extensions
+    mode: 0644
+  become: yes
+  with_fileglob:
+    - "../../config/crx/*.json"
+
+- name: Update Google Chrome menu category
+  ini_file:
+    path: /usr/share/applications/google-chrome.desktop
+    section: Desktop Entry
+    option: Categories
+    value: Network;WebBrowser;samuraiwtf

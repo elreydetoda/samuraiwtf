@@ -1,0 +1,103 @@
+- name: Install targets for SamuraiWTF
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+  - name: Create targets folder
+    file:
+      path: /opt/targets
+      state: directory
+      owner: CORP\samurai
+      group: "CORP\\domain users"
+    become: yes
+      
+
+  - name: Install nginx
+    yum:
+      name:
+        - nginx
+        - php-fpm
+    become: yes
+
+  - name: Install docker python lib
+    pip:
+      name: docker
+    become: yes
+
+  - name: Check if docker-compose is already installed
+    stat:
+      path: /usr/bin/docker-compose
+    register: stat_docker_compose
+    become: yes
+
+  - name: install docker-compose
+    get_url:
+      url: https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Linux-x86_64
+      dest: /usr/bin/docker-compose
+      mode: 0744
+    when: stat_docker_compose.stat.exists == False
+    become: yes
+
+
+  - name: set permissions for docker-compose
+    file:
+      path: /usr/bin/docker-compose
+      mode: "+x"
+    become: yes
+
+#  - name: Install docker-compose python lib
+#    pip:
+#      name: docker-compose
+
+
+  - name: Check if npm installer already downloaded
+    stat:
+      path: /tmp/npm_setup.sh
+    register: stat_npm_setup
+
+  - name: Download npm installer
+    get_url:
+      url: https://rpm.nodesource.com/setup_10.x
+      dest: /tmp/npm_setup.sh
+      mode: 0744
+#    when: stat_npm_setup.stat.exists == False
+
+  - name: Install npm repo
+    shell: '/tmp/npm_setup.sh'
+    become: yes
+#    when: stat_npm_setup.stat.exists == False
+
+  - name: Install nodejs
+    yum:
+      name: nodejs
+      enablerepo: nodesource
+    become: yes
+
+  - name: Add yarn repository
+    get_url:
+      url: http://dl.yarnpkg.com/rpm/yarn.repo
+      dest: /etc/yum.repos.d/yarn.repo
+      owner: root
+      mode: 0644
+    become: yes
+
+  - name: Install nodejs
+    yum:
+      name: 
+        - nodejs
+        - yarn
+      update_cache: yes
+    become: yes
+
+#  - import_tasks: targets/juice-shop-tasks.yml
+#  - import_tasks: targets/dvwa/dvwa-tasks.yml
+#  - import_tasks: targets/mutillidae/mutillidae-tasks.yml
+#  - import_tasks: targets/samurai-dojo/samurai-dojo-tasks.yml
+#  - import_tasks: targets/musashi/musashi-task.yml
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes

@@ -1,0 +1,75 @@
+- name: Create burpsuite folder
+  file:
+    path: /opt/samurai/burpsuite
+    state: directory
+
+- name: Ensure Java is installed
+  apt:
+    name:
+      - default-jre
+
+- name: Download burpsuite community
+  get_url:
+    url: https://portswigger.net/burp/releases/download?product=community&type=jar
+    dest: /opt/samurai/burpsuite/burp.jar
+    timeout: 30
+
+
+- name: Create burpsuite launcher
+  copy:
+    dest: /usr/bin/burp
+    content: |
+      #!/bin/bash
+      if [[ -n $(find /home/samurai/ -name 'burpsuite_pro_*') ]]
+      then
+        export BURP_PRO_PATH=$(find /home/samurai/ -name 'burpsuite_pro_*.jar' | head -n 1)
+        /usr/bin/java -jar $BURP_PRO_PATH
+      else
+        cd /opt/samurai/burpsuite/
+        /usr/bin/java -jar burp.jar
+      fi
+    mode: 0777
+  become: yes
+
+- name: Create burpsuite menu item
+  copy:
+    dest: /etc/samurai.d/applications/burpsuite.desktop
+    content: |
+      #!/usr/bin/env xdg-open
+    
+      [Desktop Entry]
+      Version=1.0
+      Type=Application
+      Terminal=false
+      Exec=burp
+      Name=Burp Suite
+      Icon=/opt/samurai/icons/burpsuite.png
+      Categories=samuraiwtf
+      Comment=Interception proxy from Portswigger
+      Name[en_US]=Burp Suite
+    mode: 0744
+  become: yes
+
+### Plugin and Extension Downloads
+- name: create burp plugins folder
+  file:
+    path: /opt/samurai/burp_plugins
+    state: directory
+    owner: "{{ lookup('env','USER') }}"
+    group: "CORP\\domain users"
+  become: yes
+  
+- name: Download burp plugin - co2
+  get_url:
+    url: https://portswigger.net/bappstore/bapps/download/c5071c7a7e004f72ae485e8a72911afc
+    dest: /opt/samurai/burp_plugins/co2.bapp
+
+- name: Download burp plugin - paramalyzer
+  get_url:
+    url: https://portswigger.net/bappstore/bapps/download/0ac13c45adff4e31a3ca8dc76dd6286c
+    dest: /opt/samurai/burp_plugins/paramalyzer.bapp
+
+- name: Download burp plugin - wsdler
+  get_url:
+    url: https://portswigger.net/bappstore/bapps/download/594a49bb233748f2bc80a9eb18a2e08f
+    dest: /opt/samurai/burp_plugins/wsdler.bapp

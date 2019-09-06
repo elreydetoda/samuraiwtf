@@ -1,0 +1,12 @@
+- name: create firefox extensions folder
+  file:
+    path: /opt/samurai/firefox_extensions
+    state: directory
+    owner: "{{ lookup('env','USER') }}"
+    group: "CORP\\domain users"
+  become: yes
+
+- name: Download foxyproxy extension
+  get_url:
+    url: https://addons.mozilla.org/firefox/downloads/latest/foxyproxy-standard/addon-2464-latest.xpi
+    dest: /opt/samurai/firefox_extensions/foxyproxy.xpi
