@@ -62,5 +62,5 @@ This is for online classrooms.  There are some caveats to this build:
   * AWS terms of services does not allow any hacking / scanning from workspaces. Therefore it is recommended that you remove the default outbound rule for the workspaces Security Group, so that no traffic will be able to leave the workspace.  Strictly speaking, once SamuraiWTF is installed and configured, internet access outbound should no longer be needed.  All the target apps are contained within the environment as local destinations.
 
 ## Amazon Linux Installation
-  * Create a Workspace (4+GB Ram, 20+GB disk space)
-  * Log in, open a terminal, and run each of the the commands under [install/aws_workspace_bootstrap.sh](https://raw.githubusercontent.com/SamuraiWTF/samuraiwtf/amazon-linux/install/aws_workspace_bootstrap.sh) in this branch.
+  * Create a Workspace (4+GB Ram, 20+ GB user disk space)
+  * Log in, open a terminal, and run each of the the commands under [install/amazon-linux/aws_workspace_bootstrap.sh](https://raw.githubusercontent.com/SamuraiWTF/samuraiwtf/amazon-linux/install/amazon-linux/aws_workspace_bootstrap.sh) in this branch.
