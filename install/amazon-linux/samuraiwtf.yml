@@ -69,10 +69,8 @@
 
   - name: Copy App icons
     copy:
-      src: ../../config/icons
+      src: ../../config/opt/samurai/
       dest: /opt/samurai/
-      directory_mode: yes
-    become: yes
 
 ### Menus
 
