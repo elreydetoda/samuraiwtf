@@ -111,42 +111,6 @@
       src: ../../config/home/bookmarks.html
       dest: /opt/samurai
 
-  - name: Install tools
-    import_playbook: tools.yml
-
-  - name: Fix default Firefox bookmarks
-    lineinfile:
-      dest: /usr/lib64/firefox/distribution/distribution.ini
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-    with_items:
-      - { regexp: '^item.1.title=Amazon Workspaces', line: 'item.1.title=Dojo Basic' }
-      - { regexp: '^item.1.link=https://aws.amazon.com/workspaces/', line: 'item.1.link=http://dojo-basic.wtf' }
-      - { regexp: '^item.2.title=Getting Started', line: 'item.2.title=DVWA' }
-      - { regexp: '^item.2.link=https://docs.aws.amazon.com', line: 'item.2.link=http://dvwa.wtf' }
-      - { regexp: '^item.3.title=Amazon Linux', line: 'item.3.title=Mutillidae' }
-      - { regexp: '^item.3.link=https://docs.aws.amazon.com', line: 'item.3.link=http://mutillidae.wtf' }
-      - { regexp: '^item.4.title=Streaming', line: 'item.4.title=CORS Lab' }
-      - { regexp: '^item.4.link=https://aws.amazon.com', line: 'item.4.link=http://www.cors.dem' }
-      - { regexp: '^item.5.title=Forums', line: 'item.5.title=Dojo Scavenger' }
-      - { regexp: '^item.5.link=https://forums.aws.amazon.com', line: 'item.5.link=http://dojo-scavenger.wtf' }
-      - { regexp: '^item.6.title=Amazon WorkDocs', line: 'item.6.title=Juice Shop CTF' }
-      - { regexp: '^item.6.link=https://aws.amazon.com/workdocs/', line: 'item.6.link=http://juice-shop.wtf' }
-    become: yes
-
-  - name: Remove extra bookmarks
-    lineinfile:
-      dest: /usr/lib64/firefox/distribution/distribution.ini
-      regexp: "^item.[78]..*"
-      state: absent
-    become: yes
-
-
-### Install Targets
-  - name: Install targets
-    import_playbook: targets.yml
-
-
 ### Update PHP Config
   - name: Update PHP listener
     replace:
@@ -211,11 +175,11 @@
       state: started
       enabled: yes
     become: yes
-   
-  handlers:
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
 
-- import_playbook: menus.yml
+### Install Tools
+- name: Install tools
+  import_playbook: tools.yml
+
+### Install Targets
+- name: Install targets
+  import_playbook: targets.yml
