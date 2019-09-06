@@ -5,10 +5,11 @@
     depth: 1
     force: yes
 
-- name: Install musashi with yarn
-  yarn:
-    path: /opt/targets/musashi
-
+- name: Install musashi
+  command: "yarn install"
+  args:
+    chdir: /opt/targets/musashi
+  become: yes
 
 - name: Script to start Musashi
   copy:

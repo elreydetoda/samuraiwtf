@@ -90,11 +90,16 @@
       update_cache: yes
     become: yes
 
+  - name: Install pip docker-compose
+    pip:
+      name: docker-compose
+    become: yes
+
 #  - import_tasks: targets/juice-shop-tasks.yml
 #  - import_tasks: targets/dvwa-tasks.yml
 #  - import_tasks: targets/mutillidae-tasks.yml
 #  - import_tasks: targets/samurai-dojo-tasks.yml
-#  - import_tasks: targets/musashi-task.yml
+#  - import_tasks: targets/musashi-tasks.yml
 
   handlers:
     - name: restart nginx
