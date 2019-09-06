@@ -140,6 +140,7 @@
         <?php phpinfo(); ?>
       mode: 0644
       force: no
+    become: yes
 
   - name: Install nginx configuration
     copy:
