@@ -41,6 +41,7 @@
       sudo npm start &
     mode: 0744
     force: no
+  become: yes
 
 - name: Create service descriptor for wtf-juice-shop
   copy:
@@ -54,17 +55,20 @@
       [Install]
       WantedBy=multi-user.target
     mode: 0744
+  become: yes
 
 - name: Start Juice-Shop
   service:
     name: wtf-juice-shop.service
     state: started
     enabled: yes
+  become: yes
 
 - name: Setup hosts file entries
   lineinfile:
     dest: /etc/hosts
     line: '127.0.0.1   juice-shop.wtf'
+  become: yes
 
 - name: Setup nginx reverse-proxy config
   copy:
@@ -78,6 +82,7 @@
         }
       }
     mode: 0644
+  become: yes
   notify:
     - restart nginx
 
