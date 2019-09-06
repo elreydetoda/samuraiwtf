@@ -4,9 +4,10 @@
     state: directory
 
 - name: Ensure Java is installed
-  apt:
+  yum:
     name:
       - default-jre
+  become: yes
 
 - name: Download burpsuite community
   get_url:
