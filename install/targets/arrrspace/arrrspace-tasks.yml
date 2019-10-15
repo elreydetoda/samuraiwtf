@@ -1,0 +1,38 @@
+- name: Make sure docker service is running
+  service:
+    name: docker
+    state: stared
+    enabled: yes
+
+- name: Pull Arrrspace project 
+  git:
+    repo: https://github.com/ProfessionallyEvil/arrrspace
+    dest: /opt/samurai/arrrspace
+    depth: 1
+
+- name: Create Arrrspace cluster
+  command:
+    chdir: /opt/samurai/arrrspace
+    argv:
+      - ./setup.sh
+
+# - name: Create Arrrspace service descriptor
+#- name: Setup hosts file entries
+#  lineinfile:
+#    dest: /etc/hosts
+#    line: '172.17.0.2   arrrspace.wtf'
+#
+#- name: Setup nginx reverse-proxy config
+#  copy:
+#    dest: /etc/nginx/conf.d/arrrspace.conf
+#    content: |
+#      server {
+#        listen 80;
+#        server_name arrrspace.wtf;
+#        location / {
+#          proxy_pass http://172.17.0.2:31380;
+#        }
+#      }
+#    mode: 0744
+#  notify:
+#    - restart nginx

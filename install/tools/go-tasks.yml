@@ -1,0 +1,33 @@
+#wget https://dl.google.com/go/go1.13.linux-amd64.tar.gz -nv -O go.tar.gz
+#    tar -C /usr/local -xzf go.tar.gz
+#    echo "export PATH=$PATH:/usr/local/go/bin:/home/vagrant/go/bin" >> /etc/profile
+#    source /etc/profile
+- name: Create Golang folder
+  file:
+    path: /opt/samurai/go
+    state: directory
+
+- name: Download go
+  get_url:
+    url: https://dl.google.com/go/go1.13.linux-amd64.tar.gz
+    dest: /opt/samurai/go/go.tar.gz
+    timeout: 30
+
+- name: Extract go tarball
+  unarchive:
+    src: /opt/samurai/go/go.tar.gz
+    dest: /usr/local
+    copy: no
+
+- name: Add go bin dir to PATH for all users
+  copy:
+    dest: /etc/profile.d/go-bin.sh
+    content: |
+      export PATH=$PATH:/usr/local/go/bin
+
+- name: Set GOPATH for all users
+  copy:
+    dest: /etc/profile.d/go-path.sh
+    content: |
+      export GOPATH=$HOME/go
+      export PATH=$GOPATH/bin:$PATH
