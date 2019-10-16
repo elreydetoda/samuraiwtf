@@ -1,2 +1,7 @@
 - name: Install kind
-  shell: GO111MODULE="on" /usr/local/go/bin/go get sigs.k8s.io/kind@v0.5.1
+  get_url:
+    url: https://github.com/kubernetes-sigs/kind/releases/download/v0.5.1/kind-linux-amd64
+    dest: /usr/bin/kind
+
+- name: Make kind executable 
+  file: path=/usr/bin/kind mode=a+x

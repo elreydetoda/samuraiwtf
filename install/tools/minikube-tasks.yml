@@ -1,0 +1,14 @@
+- name: Create Minikube folder
+  file:
+    path: /opt/samurai/minikube
+    state: directory
+
+- name: Download Minikube deb file
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube_1.4.0.deb
+    dest: /opt/samurai/minikube/minikube.deb
+    timeout: 30
+
+- name: Install Minikube deb
+  apt:
+    deb: /opt/samurai/minikube/minikube.deb

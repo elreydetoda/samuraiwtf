@@ -1,38 +1,70 @@
 - name: Make sure docker service is running
   service:
     name: docker
-    state: stared
+    state: started
     enabled: yes
+
+# might be better to use minikube
+# CHANGE_MINIKUBE_NONE_USER=true sudo minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost
+# and then simply apply all the k8s resources to the cluster.
 
 - name: Pull Arrrspace project 
   git:
     repo: https://github.com/ProfessionallyEvil/arrrspace
     dest: /opt/samurai/arrrspace
     depth: 1
+    version: app
 
-- name: Create Arrrspace cluster
-  command:
+- name: Building Arrrspace container images 
+  shell: ./setup.sh
+  args:
     chdir: /opt/samurai/arrrspace
-    argv:
-      - ./setup.sh
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
+    GO111MODULE: "on"
 
-# - name: Create Arrrspace service descriptor
-#- name: Setup hosts file entries
-#  lineinfile:
-#    dest: /etc/hosts
-#    line: '172.17.0.2   arrrspace.wtf'
-#
-#- name: Setup nginx reverse-proxy config
+- name: Create Minikube cluster
+  command: minikube start --vm-driver=none
+
+- name: Provision Arrrspace k8s resources
+  command: kubectl apply -f k8s-resources
+  args:
+    chdir: /opt/samurai/arrrspace/
+
+#- name: Create Arrrspace service descriptor
 #  copy:
-#    dest: /etc/nginx/conf.d/arrrspace.conf
+#    dest: /etc/systemd/system/wtf-dvwa.service
 #    content: |
-#      server {
-#        listen 80;
-#        server_name arrrspace.wtf;
-#        location / {
-#          proxy_pass http://172.17.0.2:31380;
-#        }
-#      }
+#      [Unit]
+#      Description=Arrrspace SamuraiWTF Target
+#      After=docker.service
+#      Requires=docker.service
+#      [Service]
+#      TimeoutStartSec=0
+#      Restart=never
+#      ExecStart=/usr/bin/minikube start --vm-driver=none
+#      ExecStop=/usr/bin/minikube delete
+#      [Install]
+#      WantedBy=multi-user.target
 #    mode: 0744
-#  notify:
-#    - restart nginx
+#  become: yes
+
+- name: Setup hosts file entries
+  lineinfile:
+    dest: /etc/hosts
+    line: '172.17.0.2   arrrspace.wtf'
+
+- name: Setup nginx reverse-proxy config
+  copy:
+    dest: /etc/nginx/conf.d/arrrspace.conf
+    content: |
+      server {
+        listen 80;
+        server_name arrrspace.wtf;
+        location / {
+          proxy_pass http://172.17.0.2:31380;
+        }
+      }
+    mode: 0744
+  notify:
+    - restart nginx

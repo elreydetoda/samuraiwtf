@@ -1,0 +1,18 @@
+- name: Create kubectl directory
+  file: 
+    path: /opt/samurai/kubectl
+    state: directory
+
+- name: Download kubectl
+  get_url: 
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/linux/amd64/kubectl
+    dest: /opt/samurai/kubectl/kubectl
+    timeout: 30
+
+- name: Make kubectl executable
+  file: path=/opt/samurai/kubectl/kubectl mode=a+x
+
+- name: Copy kubectl to /usr/bin
+  command: mv kubectl /usr/local/bin/kubectl
+  args:
+    chdir: /opt/samurai/kubectl
