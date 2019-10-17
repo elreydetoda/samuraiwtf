@@ -23,17 +23,9 @@
     PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin"
     GO111MODULE: "on"
 
-- name: Create Minikube cluster
-  command: minikube start --vm-driver=none
-
-- name: Provision Arrrspace k8s resources
-  command: kubectl apply -f k8s-resources
-  args:
-    chdir: /opt/samurai/arrrspace/
-
 #- name: Create Arrrspace service descriptor
 #  copy:
-#    dest: /etc/systemd/system/wtf-dvwa.service
+#    dest: /etc/systemd/system/wtf-arrrspace.service
 #    content: |
 #      [Unit]
 #      Description=Arrrspace SamuraiWTF Target
@@ -41,18 +33,49 @@
 #      Requires=docker.service
 #      [Service]
 #      TimeoutStartSec=0
-#      Restart=never
+#      Restart=no
 #      ExecStart=/usr/bin/minikube start --vm-driver=none
 #      ExecStop=/usr/bin/minikube delete
 #      [Install]
 #      WantedBy=multi-user.target
 #    mode: 0744
 #  become: yes
+#
+#- name: Start Arrrspace cluster
+#  service:
+#    name: wtf-arrrspace.service
+#    state: started
+#    enabled: yes
+#  become: yes
+
+- name: Create Minikube cluster
+  command: minikube start --vm-driver=none
+
+- name: Wait for minikube cluster to startup
+  command: minikube status
+  register: minikube_status
+  retries: 50 # takes a while... 
+  until: minikube_status.rc == 0
+
+- name: Provision Arrrspace k8s resources
+  command: kubectl apply -f k8s-resources
+  args:
+    chdir: /opt/samurai/arrrspace/
+  when: minikube_status.rc == 0
+
+- name: Get cluster IP
+  command: minikube ip
+  register: cluster_ip
 
 - name: Setup hosts file entries
   lineinfile:
     dest: /etc/hosts
-    line: '172.17.0.2   arrrspace.wtf'
+    line: '127.0.0.1    arrrspace.wtf'
+
+- name: Setup hosts file entries
+  lineinfile:
+    dest: /etc/hosts
+    line: '127.0.0.1    api.arrrspace.wtf'
 
 - name: Setup nginx reverse-proxy config
   copy:
@@ -62,7 +85,22 @@
         listen 80;
         server_name arrrspace.wtf;
         location / {
-          proxy_pass http://172.17.0.2:31380;
+          proxy_pass http://{{ cluster_ip.stdout }}:31380;
+        }
+      }
+    mode: 0744
+  notify:
+    - restart nginx
+
+- name: Setup nginx reverse-proxy config
+  copy:
+    dest: /etc/nginx/conf.d/api.arrrspace.conf
+    content: |
+      server {
+        listen 80;
+        server_name api.arrrspace.wtf;
+        location / {
+          proxy_pass http://{{ cluster_ip.stdout }}:31380;
         }
       }
     mode: 0744
