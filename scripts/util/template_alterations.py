@@ -55,10 +55,11 @@ def builders_alterations(json_obj):
     # print(builders_list)
 
 if __name__ == "__main__":
-    packer_file = 'samurai.json'
+    old_packer_file = bento_debian_path + '/debian-10.2-amd64.json'
+    new_packer_file = 'samurai.json'
 
     # read in file
-    with open(packer_file, 'r') as current_template:
+    with open(old_packer_file, 'r') as current_template:
         data = current_template.read()
 
     # replacing all instances of template dir with a user var
