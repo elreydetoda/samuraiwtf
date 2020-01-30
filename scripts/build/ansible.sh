@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -exuo pipefail
+set -exu
 
 sudo apt install -y python3-pip dirmngr
 
