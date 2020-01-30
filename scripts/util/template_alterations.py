@@ -2,6 +2,7 @@
 import json
 from pprint import pprint
 
+## global variables
 scripts_path = './scripts'
 build_script = scripts_path + '/build'
 ansible_scripts = scripts_path + '/'
@@ -35,15 +36,21 @@ def var_alterations(json_obj):
         'http_directory': bento_debian_path + '/http'
     }
 
+    # making alteration as defined above
     variables_dict.update(sub_list)
+
+    # returning altered object
     return json_obj
 
+# alterations to the builders section of the packer template
 def builders_alterations(json_obj):
     # only selecting the vars section from the template
     builders_list = json_obj['builders']
 
+    # currently supported builders
     allowed_builders_list = [ 'virtualbox-iso', 'vmware-iso']
 
+    # removing unsupported builders
     for builder in builders_list:
         if builder['type'] not in allowed_builders_list:
             print(builder['type'])
@@ -55,10 +62,12 @@ def builders_alterations(json_obj):
     # print(builders_list)
 
 if __name__ == "__main__":
+    # location of old debian template
     old_packer_file = bento_debian_path + '/debian-10.2-amd64.json'
+    # location of file getting outputted
     new_packer_file = 'samurai.json'
 
-    # read in file
+    # read in old file
     with open(old_packer_file, 'r') as current_template:
         data = current_template.read()
 
@@ -70,6 +79,9 @@ if __name__ == "__main__":
     # converting to json object
     obj = json.loads(data)
 
+    # altering variable section of packer json template
     updated_obj = var_alterations(obj)
+
+    # altering builders section of packer json template
     updated_obj = builders_alterations(updated_obj)
     # pprint(updated_obj)
