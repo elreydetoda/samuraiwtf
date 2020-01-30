@@ -83,7 +83,7 @@ if gpg --verify "${verAlgSig}" "${verAlg}" &>/dev/null  ; then
 
   rm "${verAlg}" "${verAlgSig}"
 
-  printf '{"iso_url":"%s","iso_checksum_type":"%s","iso_checksum":"%s","vm_name":"%s","vm_version":"%s","vagrant_cloud_token":"%s"}\n' "$downloadUrl" "$alg" "$currentHash" "$namez" "$vm_version" "$vagrant_cloud_token" | jq . | tee variables.json
+  printf '{"iso_url":"%s","iso_checksum_type":"%s","iso_checksum":"%s","vagrant_box_name":"%s","vm_version":"%s","vagrant_cloud_token":"%s"}\n' "$downloadUrl" "$alg" "$currentHash" "$namez" "$vm_version" "$vagrant_cloud_token" | jq . | tee variables.json
 else
   echo "Bad file signing exiting now"
   exit 2
