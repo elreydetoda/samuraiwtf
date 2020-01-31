@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from time import sleep
 import json
 from pprint import pprint
 
@@ -49,17 +50,18 @@ def builders_alterations(json_obj):
 
     # currently supported builders
     allowed_builders_list = [ 'virtualbox-iso', 'vmware-iso']
+    removal_builders_list = [ ]
 
     # removing unsupported builders
     for builder in builders_list:
         if builder['type'] not in allowed_builders_list:
             print(builder['type'])
-            builders_list.remove(builder)
+            removal_builders_list.append(builder)
 
-    # for builder in builders_list:
-        # print(builder)
-        # print(builder['type'])
-    # print(builders_list)
+    for removed in removal_builders_list:
+        builders_list.remove(removed)
+
+    return builders_list
 
 if __name__ == "__main__":
     # location of old debian template
