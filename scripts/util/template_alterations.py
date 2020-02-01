@@ -2,6 +2,7 @@
 from time import sleep
 import json
 from pprint import pprint
+from inspect import getframeinfo, currentframe
 
 ## global variables
 scripts_path = './scripts'
@@ -11,8 +12,26 @@ bento_path = build_script + '/bento'
 bento_debian_path = bento_path + '/packer_templates/debian'
 base_box_name = 'samuraiewtf-base_box'
 
+# start each section with a pre-defined message and it's name
+def section_intro(current_func):
+    # adding extra spacing
+    print('')
+
+    # using logging function to print
+    logging('Starting {} section'.format(current_func))
+
+# logging func
+def logging(log_str):
+    pprint(log_str)
+
+# def del_from_list(list_obj, list_del):
+#     for objz in li
+
 # alterations to the variables section of the packer template
 def var_alterations(json_obj):
+
+    # starting section by logging name
+    section_intro(getframeinfo(currentframe()).function)
 
     # only selecting the vars section from the template
     variables_dict = json_obj['variables']
@@ -24,10 +43,11 @@ def var_alterations(json_obj):
 
     # removing all items in list above
     for var in remove_list:
+        logging('removed: {}'.format(var))
         del variables_dict[var]
 
     # either adding or updating values in template
-    sub_list = {
+    sub_dict = {
         'headless': '',
         'iso_checksum': '',
         'iso_checksum_type': '',
@@ -38,29 +58,56 @@ def var_alterations(json_obj):
     }
 
     # making alteration as defined above
-    variables_dict.update(sub_list)
+    variables_dict.update(sub_dict)
 
     # returning altered object
     return json_obj
 
 # alterations to the builders section of the packer template
 def builders_alterations(json_obj):
+
+    # starting section by logging name
+    section_intro(getframeinfo(currentframe()).function)
+
     # only selecting the vars section from the template
     builders_list = json_obj['builders']
 
     # currently supported builders
     allowed_builders_list = [ 'virtualbox-iso', 'vmware-iso']
+    # delcaring empty list (used later)
     removal_builders_list = [ ]
 
-    # removing unsupported builders
+    # adding unsupported builders to be removed later
     for builder in builders_list:
         if builder['type'] not in allowed_builders_list:
-            print(builder['type'])
             removal_builders_list.append(builder)
 
+    # removing unsupported builders
     for removed in removal_builders_list:
+        logging('removed: {}'.format(removed['type']))
         builders_list.remove(removed)
 
+    # defining what properties have to be removed
+    prop_removal = [ 'guest_additions_url' ]
+
+    # defining what properties have to be updated/added
+    prop_update = {
+        'iso_url': '{{user `iso_url`}}'
+    }
+
+    # removing properties and logging
+    for prop_rm in prop_removal:
+        for builder_dict in builders_list:
+            if prop_rm in builder_dict:
+                logging('removed: {} from: {}'.format(prop_rm, builder_dict['type']))
+                del builder_dict[prop_rm]
+
+    # updating properties to desired state
+    for builder_dict in builders_list:
+        logging('updated property: {} in: {}'.format(prop_update, builder_dict['type']))
+        builder_dict.update(prop_update)
+
+    # returning altered object
     return builders_list
 
 if __name__ == "__main__":
@@ -86,4 +133,4 @@ if __name__ == "__main__":
 
     # altering builders section of packer json template
     updated_obj = builders_alterations(updated_obj)
-    # pprint(updated_obj)
+    # logging(updated_obj)
