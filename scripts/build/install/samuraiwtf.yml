@@ -26,8 +26,8 @@
       groups: 'sudo'
 
   - name: Copy configuration files to opt/samurai
-    copy:
-      src: ../config/opt/
+    unarchive:
+      src: /tmp/config.tgz
       dest: /opt/
       mode: 0744
 
@@ -50,7 +50,7 @@
 
   - name: Set default background
     copy:
-      src: ../config/opt/samurai/samurai-background.png
+      src: /opt/config/opt/samurai/samurai-background.png
       dest: /etc/alternatives/desktop-background
 
   - name: Make ansible configuration directory
@@ -98,14 +98,3 @@
 
 - name: Configure training materials
   import_playbook: training.yml
-
-- name: Rebooting to finalize setup
-  hosts: all
-  connection: local
-  become: yes
-  tasks:
-
-  - name: Reboot after installation
-    shell: sleep 2 && /sbin/reboot
-    ignore_errors: true
-

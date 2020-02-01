@@ -62,7 +62,7 @@
 - name: Copy scavenger init db script
   copy:
     dest: /opt/targets/samuraidojo/src/scavenger/init_db.sh
-    src: ../config/init_db.sh
+    src: /opt/config/init_db.sh
     mode: 0744
   become: yes
 
@@ -146,4 +146,3 @@
   uri:
     url: http://localhost:30080/reset-db.php
   ignore_errors: yes
-

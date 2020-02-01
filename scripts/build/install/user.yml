@@ -7,6 +7,5 @@
   - name: Copy home folder contents
     copy:
       dest: /home/samurai
-      src: ../config/home/
+      src: /opt/config/home/
       owner: samurai
-
