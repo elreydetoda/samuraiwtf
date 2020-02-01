@@ -163,14 +163,14 @@ def prov_alterations(json_obj):
         {
             'type': 'file',
             'source': build_script + '/config.tgz',
-            'destination': '/tmp/config.tgz''
+            'destination': '/tmp/config.tgz'
         }
     )
 
     ## ANSIBLE: run all the samurai scripts
     prov_list.append(
         {
-            'type': 'ansible-local','
+            'type': 'ansible-local',
             'playbook_dir': build_script + '/install',
             'playbook_file': 'samuraiwtf.yml'
         }
@@ -215,4 +215,4 @@ if __name__ == "__main__":
     updated_obj = prov_alterations(updated_obj)
 
     # logging final object
-    # logging(updated_obj)
+    logging(updated_obj)
