@@ -21,6 +21,19 @@ def section_intro(current_func):
     # using logging function to print
     logging('Starting {} section'.format(current_func))
 
+    # adding extra spacing
+    print('')
+
+def section_outro(current_func):
+    # adding extra spacing
+    print('')
+
+    # using logging function to print
+    logging('Exiting {} section'.format(current_func))
+
+    # adding extra spacing
+    print('')
+
 # logging func
 def logging(log_str):
     pprint(log_str)
@@ -62,6 +75,7 @@ def var_alterations(json_obj):
     # making alteration as defined above
     variables_dict.update(sub_dict)
 
+    section_outro(getframeinfo(currentframe()).function)
     # returning altered object
     return json_obj
 
@@ -109,6 +123,7 @@ def builders_alterations(json_obj):
         logging('updated property: {} in: {}'.format(prop_update, builder_dict['type']))
         builder_dict.update(prop_update)
 
+    section_outro(getframeinfo(currentframe()).function)
     # returning altered object
     return json_obj
 
@@ -185,6 +200,7 @@ def prov_alterations(json_obj):
 
     prov_list.append(bento_copy_prov)
 
+    section_outro(getframeinfo(currentframe()).function)
     return json_obj
 
 if __name__ == "__main__":
