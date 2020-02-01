@@ -3,6 +3,7 @@ from time import sleep
 import json
 from pprint import pprint
 from inspect import getframeinfo, currentframe
+from copy import deepcopy
 
 ## global variables
 scripts_path = './scripts'
@@ -54,7 +55,8 @@ def var_alterations(json_obj):
         'build_directory': './builds',
         'bento_debian_dir': bento_debian_path,
         'box_basename': base_box_name,
-        'http_directory': bento_debian_path + '/http'
+        'http_directory': bento_debian_path + '/http',
+        'build_script_dir': build_script
     }
 
     # making alteration as defined above
@@ -108,7 +110,82 @@ def builders_alterations(json_obj):
         builder_dict.update(prop_update)
 
     # returning altered object
-    return builders_list
+    return json_obj
+
+def prov_alterations(json_obj):
+
+    # starting section by logging name
+    section_intro(getframeinfo(currentframe()).function)
+
+    prov_list = json_obj['provisioners']
+
+    bento_prov = prov_list[0]
+
+    ## altering the only bash provisioner bento has by default
+    # making list of how many vars (in reverse order) we want to remove
+    env_var_list = [ 'no_proxy', 'https_proxy', 'http_proxy' ]
+
+    # removing env vars
+    for env in env_var_list:
+        logging('removing: {}'.format(env))
+        bento_prov['environment_vars'].pop()
+
+    # creating deepcopy of env to use later, so we can alter it and it not
+    #   mess up the original:
+    #   https://stackoverflow.com/questions/2612802/how-to-clone-or-copy-a-list
+    bento_copy_prov = deepcopy(bento_prov)
+
+    # creating list to save last 2 scripts from bento, so they can be run
+    #   later after all other provisioing (they are used for cleanup)
+    cleanup_scripts = []
+
+    # minimize.sh
+    cleanup_scripts.append(bento_prov['scripts'].pop())
+
+    # cleanup.sh
+    cleanup_scripts.append(bento_prov['scripts'].pop())
+
+    # adding my new scripts to the scripts section
+    # all my custom scripts (desktop & ansible) are in build_script_dir
+    my_scripts_list = [
+        '{{user `build_script_dir`}}/upgrade.sh',
+        '{{user `build_script_dir`}}/ansible.sh',
+        '{{user `build_script_dir`}}/desktop-env.sh'
+    ]
+
+    # adding my personal scripts
+    for my_script in my_scripts_list:
+        bento_prov['scripts'].append(my_script)
+
+    ### need to add the following provisions
+    ## FILE: upload compressed config files to /tmp
+    prov_list.append(
+        {
+            'type': 'file',
+            'source': build_script + '/config.tgz',
+            'destination': '/tmp/config.tgz''
+        }
+    )
+
+    ## ANSIBLE: run all the samurai scripts
+    prov_list.append(
+        {
+            'type': 'ansible-local','
+            'playbook_dir': build_script + '/install',
+            'playbook_file': 'samuraiwtf.yml'
+        }
+    )
+
+    ## SHELL: move last 2 scripts (cleanup) to bottom
+    # clearing scripts section of all previous scripts
+    bento_copy_prov['scripts'].clear()
+
+    for scriptz in cleanup_scripts:
+        bento_copy_prov['scripts'].append(scriptz)
+
+    prov_list.append(bento_copy_prov)
+
+    return json_obj
 
 if __name__ == "__main__":
     # location of old debian template
@@ -133,4 +210,9 @@ if __name__ == "__main__":
 
     # altering builders section of packer json template
     updated_obj = builders_alterations(updated_obj)
+
+    # altering provisioners section of packer json template
+    updated_obj = prov_alterations(updated_obj)
+
+    # logging final object
     # logging(updated_obj)
