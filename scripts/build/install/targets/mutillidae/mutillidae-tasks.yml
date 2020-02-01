@@ -7,6 +7,7 @@
 - name: Pulling Mutillidae docker container
   docker_image:
     name: bit0pus/docker-mutillidae
+    source: pull
 
 - name: Create service descriptor
   copy:

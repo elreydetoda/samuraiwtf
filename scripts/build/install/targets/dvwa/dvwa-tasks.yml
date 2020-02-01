@@ -7,6 +7,7 @@
 - name: Pulling DVWA docker container
   docker_image:
     name: bit0pus/docker-dvwa
+    source: pull
 
 - name: Create service descriptor
   copy:
