@@ -35,4 +35,4 @@ append_array(){
 append_array "system" "${system_options[@]}"
 
 # define the bleachbit command as
-bleachbit -p "${bleach_bit_options_array[@]}"
+sudo bleachbit -c "${bleach_bit_options_array[@]}"
