@@ -41,7 +41,7 @@ def logging(log_str):
 # def del_from_list(list_obj, list_del):
 #     for objz in li
 
-# alterations to the variables section of the packer template
+# alterations to the environment variables section of the packer template
 def var_alterations(json_obj):
 
     # starting section by logging name
@@ -67,9 +67,10 @@ def var_alterations(json_obj):
         'iso_checksum_type': '',
         'build_directory': './builds',
         'bento_debian_dir': bento_debian_path,
+        'build_script_dir': build_script,
         'box_basename': base_box_name,
         'http_directory': bento_debian_path + '/http',
-        'build_script_dir': build_script
+        'memory': '4096'
     }
 
     # making alteration as defined above
@@ -187,7 +188,7 @@ def prov_alterations(json_obj):
         {
             'type': 'ansible-local',
             'playbook_dir': build_script + '/install',
-            'playbook_file': 'samuraiwtf.yml'
+            'playbook_file': './scripts/build/install/samuraiwtf.yml'
         }
     )
 
@@ -195,9 +196,14 @@ def prov_alterations(json_obj):
     # clearing scripts section of all previous scripts
     bento_copy_prov['scripts'].clear()
 
-    for scriptz in cleanup_scripts:
+    for scriptz in reversed(cleanup_scripts):
         bento_copy_prov['scripts'].append(scriptz)
 
+    # altering the the path for the cleanup.sh, so it
+    # doesn't try to uninstall X11 packages
+    bento_copy_prov['scripts'][0] = "{{user `build_script_dir`}}/cleanup.sh"
+
+    # appending to provisioners list
     prov_list.append(bento_copy_prov)
 
     section_outro(getframeinfo(currentframe()).function)
@@ -231,4 +237,8 @@ if __name__ == "__main__":
     updated_obj = prov_alterations(updated_obj)
 
     # logging final object
-    logging(updated_obj)
+    # logging(updated_obj)
+
+    # writing out to file
+    with open('samurai.json', 'w', encoding='utf-8') as f:
+        json.dump(updated_obj, f, ensure_ascii=False, indent=4)
