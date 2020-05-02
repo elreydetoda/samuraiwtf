@@ -2,6 +2,8 @@
 
 set -exu
 
+sudo apt-get install -y bleachbit
+
 ## base section
 # declare all base options that aren't all sub-options (i.e. apt.*),
 # and have only have one sub-options for bleachbit (i.e. journald.clean)
@@ -36,3 +38,6 @@ append_array "system" "${system_options[@]}"
 
 # define the bleachbit command as
 sudo bleachbit -c "${bleach_bit_options_array[@]}"
+
+sudo apt-get purge -y bleachbit
+sudo apt-get autoremove --purge -y
