@@ -23,7 +23,8 @@ SCRIPT
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "bento/debian-10"
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vbguest.auto_update = false
   config.vm.provision "shell", inline: "echo '/vagrant/scripts/setup/prov.sh' >> ~vagrant/.bashrc"
   config.vm.provision "shell", inline: $CIRCLECI # , run:"always"
 end
