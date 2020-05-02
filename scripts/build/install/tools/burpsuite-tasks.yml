@@ -29,6 +29,7 @@
         cd /opt/samurai/burpsuite/
         /usr/bin/java -jar burp.jar
       fi
+    # TODO: fix permissions to 755
     mode: 0777
   become: yes
 
@@ -50,5 +51,3 @@
       Name[en_US]=Burp Suite
     mode: 0744
   become: yes
-
-
