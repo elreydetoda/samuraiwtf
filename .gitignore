@@ -6,6 +6,8 @@ config/home/Burp*
 
 # ansible
 *.retry
+.venv/*
+.vscode/*
 
 # OSX
 .DS_Store
