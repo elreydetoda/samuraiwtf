@@ -11,7 +11,7 @@ build_script = scripts_path + '/build'
 ansible_scripts = scripts_path + '/'
 bento_path = build_script + '/bento'
 bento_debian_path = bento_path + '/packer_templates/debian'
-base_box_name = 'samuraiewtf-base_box'
+base_box_name = 'samuraiwtf-base_box'
 
 # start each section with a pre-defined message and it's name
 def section_intro(current_func):
@@ -65,7 +65,7 @@ def var_alterations(json_obj):
         'headless': '',
         'iso_checksum': '',
         'iso_checksum_type': '',
-        'build_directory': './builds',
+        'build_directory': '.',
         'bento_debian_dir': bento_debian_path,
         'build_script_dir': build_script,
         'box_basename': base_box_name,
@@ -161,12 +161,17 @@ def prov_alterations(json_obj):
     # cleanup.sh
     cleanup_scripts.append(bento_prov['scripts'].pop())
 
+    # bleachbit.sh
+    # cleanup_scripts.append(
+    #     '{{user `build_script_dir`}}/bleachbit.sh'
+    # )
+
     # adding my new scripts to the scripts section
     # all my custom scripts (desktop & ansible) are in build_script_dir
     my_scripts_list = [
         '{{user `build_script_dir`}}/upgrade.sh',
-        '{{user `build_script_dir`}}/ansible.sh',
-        '{{user `build_script_dir`}}/desktop-env.sh'
+        '{{user `build_script_dir`}}/desktop-env.sh',
+        '{{user `build_script_dir`}}/ansible.sh'
     ]
 
     # adding my personal scripts
@@ -209,6 +214,43 @@ def prov_alterations(json_obj):
     section_outro(getframeinfo(currentframe()).function)
     return json_obj
 
+def post_processor_alteration(json_obj):
+    section_intro(getframeinfo(currentframe()).function)
+
+    # getting current post-processors
+    post_processors = json_obj['post-processors']
+
+    # updating vagrant processor
+    post_processors[0].update(
+        {
+            'compression_level': 9
+        }
+    )
+
+    # defining new post processors
+    vagrant_cloud_dict = {
+        'type': 'vagrant-cloud',
+        'box_tag': '{{user `vagrant_box_name`}}',
+        'access_token': '{{user `vagrant_cloud_token`}}',
+        'version': '{{user `vm_version`}}'
+    }
+
+    # group 1 of post processors, need to group because of this:
+    # https://packer.io/docs/post-processors/vagrant-cloud.html#use-with-the-artifice-post-processor
+    post_processors_group1 = [
+        post_processors[0],
+        vagrant_cloud_dict
+    ]
+
+    # clean out old bento vagrant post-provisioner
+    post_processors.clear()
+
+    # updating to make first grouping to process for post-processors
+    post_processors.insert(0, post_processors_group1)
+
+    section_outro(getframeinfo(currentframe()).function)
+    return json_obj
+
 if __name__ == "__main__":
     # location of old debian template
     old_packer_file = bento_debian_path + '/debian-10.2-amd64.json'
@@ -235,6 +277,9 @@ if __name__ == "__main__":
 
     # altering provisioners section of packer json template
     updated_obj = prov_alterations(updated_obj)
+
+    # adding to post-processors
+    updated_obj = post_processor_alteration(updated_obj)
 
     # logging final object
     # logging(updated_obj)
