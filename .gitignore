@@ -26,3 +26,8 @@ output-*-iso/
 variables.json
 secrets.txt
 scripts/setup/env_vars
+
+## automated packer files
+samurai.json
+# compressed config folder
+*.tgz
