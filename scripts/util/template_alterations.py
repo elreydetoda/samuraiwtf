@@ -10,7 +10,8 @@ scripts_path = './scripts'
 build_script = scripts_path + '/build'
 ansible_scripts = scripts_path + '/'
 bento_path = build_script + '/bento'
-bento_debian_path = bento_path + '/packer_templates/debian'
+# bento_debian_path = bento_path + '/packer_templates/debian'
+bento_ubuntu_path = bento_path + '/packer_templates/ubuntu'
 base_box_name = 'samuraiwtf-base_box'
 
 # start each section with a pre-defined message and it's name
@@ -66,10 +67,12 @@ def var_alterations(json_obj):
         'iso_checksum': '',
         'iso_checksum_type': '',
         'build_directory': '.',
-        'bento_debian_dir': bento_debian_path,
+        # 'bento_debian_dir': bento_debian_path,
+        'bento_ubuntu_dir': bento_ubuntu_path,
         'build_script_dir': build_script,
         'box_basename': base_box_name,
-        'http_directory': bento_debian_path + '/http',
+        # 'http_directory': bento_debian_path + '/http',
+        'http_directory': bento_ubuntu_path + '/http',
         'memory': '4096'
     }
 
@@ -253,7 +256,8 @@ def post_processor_alteration(json_obj):
 
 if __name__ == "__main__":
     # location of old debian template
-    old_packer_file = bento_debian_path + '/debian-10.2-amd64.json'
+    # old_packer_file = bento_debian_path + '/debian-10.2-amd64.json'
+    old_packer_file = bento_ubuntu_path + '/ubuntu-20.04-amd64.json'
     # location of file getting outputted
     new_packer_file = 'samurai.json'
 
@@ -264,7 +268,8 @@ if __name__ == "__main__":
     # replacing all instances of template dir with a user var
     #   of bento_debian_path, because that is the location it
     #   is expecting for relative file traversal
-    data = data.replace('template_dir', 'user `bento_debian_dir`')
+    # data = data.replace('template_dir', 'user `bento_debian_dir`')
+    data = data.replace('template_dir', 'user `bento_ubuntu_dir`')
 
     # converting to json object
     obj = json.loads(data)
