@@ -26,7 +26,8 @@ circle_ci(){
 }
 
 variables_gen(){
-  path_to_new_debian_shell_script='/vagrant/scripts/setup/debian.sh'
+  # path_to_new_debian_shell_script='/vagrant/scripts/setup/debian.sh'
+  path_to_new_ubuntu_shell_script='/vagrant/scripts/setup/ubuntu.sh'
   if [[ $CIRCLECI ]] ; then
     project_dir="${HOME}/project"
   else
@@ -39,14 +40,17 @@ variables_gen(){
   sudo apt-get install -y jq screen dirmngr
 
   pushd ${project_dir}
-  chmod +x ${path_to_new_debian_shell_script}
-  ${path_to_new_debian_shell_script}
+  # chmod +x ${path_to_new_debian_shell_script}
+  chmod +x ${path_to_new_ubuntu_shell_script}
+  # ${path_to_new_debian_shell_script}
+  ${path_to_new_ubuntu_shell_script}
 }
 
 ## base framework
 selection_setup(){
   PROJECT=''
-  projects_array=( "variables_gen" "circle_ci")
+  # projects_array=( "variables_gen" "circle_ci")
+  projects_array=( "variables_gen" )
   project_index=0
 }
 
