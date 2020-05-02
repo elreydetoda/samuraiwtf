@@ -3,6 +3,8 @@
   hosts: all
   connection: local
   become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
 
   - name: Install some dependencies
@@ -48,6 +50,12 @@
     debconf:
       name: lightdm
 
+  # bash command is as follow: sudo update-alternatives --install /usr/share/images/desktop-base/desktop-background desktop-background /opt/config/opt/samurai/samurai-background.png 100
+  # TODO: use alternatives command with these options
+  # link: /usr/share/images/desktop-base/desktop-background
+  # name: desktop-background
+  # path: /opt/config/opt/samurai/samurai-background.png
+  # priority: 100
   - name: Set default background
     copy:
       src: /opt/config/opt/samurai/samurai-background.png
@@ -74,6 +82,7 @@
       repo: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
       state: present
 
+  # TODO: remove containerd.io and docker-ce-cli (should come packaged w/docker-ce)
   - name: Install Docker stuff 
     apt:
       name:
@@ -89,12 +98,20 @@
 
 - name: Install tools
   import_playbook: tools.yml
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Install targets
   import_playbook: targets.yml
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Configure samurai user
   import_playbook: user.yml
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Configure training materials
   import_playbook: training.yml
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
