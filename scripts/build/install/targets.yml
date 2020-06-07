@@ -49,7 +49,7 @@
 
   - name: Download npm installer
     get_url:
-      url: https://deb.nodesource.com/setup_10.x
+      url: https://deb.nodesource.com/setup_12.x
       dest: /tmp/npm_setup.sh
       mode: 0744
     when: stat_npm.stat.exists == False
@@ -74,12 +74,12 @@
         - yarn
       update_cache: yes
 
-  - import_tasks: targets/musashi/musashi-task.yml
-  - import_tasks: targets/amoksecurity/amoksecurity-tasks.yml
-  - import_tasks: targets/samurai-dojo/samurai-dojo-tasks.yml
-  - import_tasks: targets/juice-shop/juice-shop-tasks.yml
-  - import_tasks: targets/dvwa/dvwa-tasks.yml
-  - import_tasks: targets/mutillidae/mutillidae-tasks.yml
+  # - import_tasks: targets/musashi/musashi-task.yml
+  # - import_tasks: targets/amoksecurity/amoksecurity-tasks.yml
+  # - import_tasks: targets/samurai-dojo/samurai-dojo-tasks.yml
+  # - import_tasks: targets/juice-shop/juice-shop-tasks.yml
+  # - import_tasks: targets/dvwa/dvwa-tasks.yml
+  # - import_tasks: targets/mutillidae/mutillidae-tasks.yml
 
 
   handlers:
