@@ -187,7 +187,7 @@ def prov_alterations(json_obj):
         {
             "type": "shell-local",
             "execute_command": [ "bash", "-c", "{{.Script}}" ],
-            "command": "cd ./scripts/build/ || exit 1 && tar -czvf config.tgz config && cd -"
+            "command": "pushd ./scripts/build/ || exit 1 && tar -czvf config.tgz config && popd"
 
         }
     )
