@@ -1,0 +1,15 @@
+# packet info
+export PACKET_API_KEY='g1JHi8DSNKXjPCrsHkcqKVoev6QpBdNF'
+export PACKET_PROJECT_UUID='e4badf83-b3cf-4e8b-87aa-106bde7b3bae'
+
+# vagrant cloud info
+export VAGRANT_CLOUD_USER='SamuraiWTF'
+export VAGRANT_CLOUD_TOKEN='w1QjiLi2LQCHrQ.atlasv1.ecX5sHbQvVduQjFR7zLKVUeHAXyv40yUeHHcqqTeYUPeaHktjHggyH1hVSLnTyymPCE' 
+
+# versioning for vagrant cloud
+export MAJOR_RELEASE_VERSION=0
+export MINOR_RELEASE_VERSION=0
+
+# text info
+export PERSONAL_NUM='9802772746'
+export TEXTBELT_KEY='02e5d12da5c2284a00e0b085fb22539b379b954aMuhWEML04OQZaEnWtA3g7G75l'
