@@ -1,3 +1,8 @@
+**DO NOT USE!!!**
+
+This was merged in this pr: https://github.com/SamuraiWTF/samuraiwtf/pull/136
+
+
 <p align="center">
   <img alt="SamuraiWTF Logo" src="https://tiny.si/images/SamuraiWTFLogo.png" height="200"/>
 </p>
